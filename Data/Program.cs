@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Data.Models;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 const string connecctionstring = "Data Source=LAPTOP-563RGJKO\\sqlexpress;Initial Catalog=balta;Integrated Security=True;TrustServerCertificate=True";
 
@@ -10,10 +11,11 @@ const string connecctionstring = "Data Source=LAPTOP-563RGJKO\\sqlexpress;Initia
 using (var connection = new SqlConnection(connecctionstring))
 {
     //UpdateCategory(connection);
-    CreateManyCategories(connection);
-    LisCategories(connection);
+    //CreateManyCategories(connection);
+    //LisCategories(connection);
     //CreateCategory(connection);
-
+    //ExecuteProcedure(connection);
+    ExecuteReadProcedure(connection);
 };
 
 static void LisCategories(SqlConnection connection)
@@ -140,3 +142,38 @@ static void CreateManyCategories(SqlConnection connection)
 
     Console.WriteLine($"{rows} linhas inseridas");
 }
+
+// Procedure que ñ retorna informações por enquanto
+static void ExecuteProcedure(SqlConnection connection)
+{
+    var procedure = "[spDeleteStudent]"; 
+
+    var pars = new { StudentId = "584F93A9-E7CE-45E6-92FB-A2F8C3259E55" };
+
+    // Onde inicia a Procedure
+    var affectedRows = connection.Execute(procedure, pars, commandType: CommandType.StoredProcedure);
+
+    Console.WriteLine($"{affectedRows} linhas afetadas");
+
+}
+
+// Procedure de leitura
+static void ExecuteReadProcedure(SqlConnection connection)
+{
+    var procedure = "[spGetCoursesByCategory]";
+
+    var pars = new { CategoryId = "5B4CE823-CD82-4F2F-81E9-FEE34A62902E" };
+
+    // Array dynamic
+    var courses = connection.Query<Category>(
+        procedure, 
+        pars, 
+        commandType: CommandType.StoredProcedure);
+
+    foreach ( var item in courses)
+    {
+        Console.WriteLine(item.Id);
+    }
+}
+
+
